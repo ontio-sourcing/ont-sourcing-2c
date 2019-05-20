@@ -89,24 +89,25 @@
 
 	<update id="createNewTable">
 CREATE TABLE `${newTableName}` (
-`id` int(11) NOT NULL AUTO_INCREMENT,
- `ontid` varchar(255) NOT NULL,
- `txhash` varchar(255),
- `filehash` varchar(255) NOT NULL,
- `contract_key` varchar(255) NOT NULL,
- `detail` text NOT NULL,
- `type` varchar(16) NOT NULL,
- `timestamp` datetime NOT NULL,
- `timestamp_sign` text NOT NULL,
- `create_time` datetime NOT NULL,
- `update_time` datetime DEFAULT NULL,
-`status` int(11) NOT NULL DEFAULT '2' COMMENT '0-未删除；1-已删除；2-待确认',
-PRIMARY KEY (`id`),
- UNIQUE KEY `txhash` (`txhash`) USING BTREE,
- KEY `filehash` (`filehash`),
- KEY `contract_key` (`contract_key`),
- KEY `type` (`type`),
- KEY `ontid` (`ontid`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`ontid` varchar(255) NOT NULL,
+	`txhash` varchar(255) DEFAULT NULL,
+	`filehash` varchar(255) NOT NULL,
+	`contract_key` varchar(255) NOT NULL,
+	`detail` text NOT NULL,
+	`type` varchar(16) NOT NULL,
+	`timestamp` datetime NOT NULL,
+	`timestamp_sign` text NOT NULL,
+	`create_time` datetime NOT NULL,
+	`update_time` datetime DEFAULT NULL,
+	`status` int(11) NOT NULL DEFAULT '2' COMMENT '0-未删除；1-已删除；2-待确认',
+	`cyano_info` text,
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `txhash` (`txhash`) USING BTREE,
+	KEY `filehash` (`filehash`),
+	KEY `type` (`type`),
+	KEY `ontid` (`ontid`),
+	KEY `contract_key` (`contract_key`)
+	) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8
   </update>
 </mapper>
