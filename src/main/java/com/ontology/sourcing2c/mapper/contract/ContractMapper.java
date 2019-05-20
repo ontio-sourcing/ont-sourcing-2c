@@ -11,10 +11,9 @@ public interface ContractMapper {
 
     int insert(@Param("tableName") String tableName, @Param("record") Contract record);
 
-    int insertSelective(@Param("tableName") String tableName, @Param("record") Contract record);
-
+    // int insertSelective(@Param("tableName") String tableName, @Param("record") Contract record);
     //
-    void insertBatch(@Param("tableName") String tableName, @Param("contractList") List<Contract> contractList);
+    // void insertBatch(@Param("tableName") String tableName, @Param("contractList") List<Contract> contractList);
 
     //
     List<Contract> selectByOntidAndHash(@Param("tableName") String tableName, @Param("ontid") String ontid, @Param("hash") String hash);
@@ -24,6 +23,15 @@ public interface ContractMapper {
 
     //
     List<Contract> selectByHash(@Param("tableName") String tableName, @Param("hash") String hash);
+
+    //
+    Contract selectByContractKey(@Param("tableName") String tableName, @Param("hash") String hash);
+
+    //
+    String selectCyanoInfoByContractKey(@Param("tableName") String tableName, @Param("hash") String hash);
+
+    //
+    Integer updateByContractKey(@Param("tableName") String tableName, @Param("txhash") String txhash, @Param("status") Integer status, @Param("contractKey") String contractKey);
 
     //
     int count(@Param("tableName") String tableName, @Param("ontid") String ontid);

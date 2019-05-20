@@ -66,7 +66,38 @@ method：POST
 ```json
 {
     "desc": "SUCCESS",
-    "action": "putAttestation",
+    "error": 0,
+    "version": "1.0.0",
+    "result": "/api/v1/c/attestation/cyano/ca4e952e3f96fb4c1b800153bf6d2c8c648b88371f613d13ea8ac75f29048f29",
+    "action": "putAttestation"
+}
+```
+
+| Field_Name | Type   | Description                   |
+|:-----------|:-------|:------------------------------|
+| error      | int    | 错误码                        |
+| action     | String | 动作标志                      |
+| desc       | String | 成功返回SUCCESS，失败返回错误描述 |
+| result     | String | 成功返回true，失败返回""     |
+| version    | String | 版本号                        |
+
+### 二维码
+
+```text
+url：/attestation/cyano/{hash}
+method：GET
+```
+
+| Field_Name | Type   | Description |
+|:-----------|:-------|:------------|
+| hash   | String |     |
+
+- 响应：
+
+```json
+{
+    "desc": "SUCCESS",
+    "action": "getAttestationCyanoInfo",
     "result": {
         "action": "invoke",
         "version": "v1.0.0",
@@ -107,6 +138,7 @@ method：POST
 | desc       | String | 成功返回SUCCESS，失败返回错误描述 |
 | result     | String | 成功返回true，失败返回""     |
 | version    | String | 版本号                        |
+
 
 
 ### 根据hash取证

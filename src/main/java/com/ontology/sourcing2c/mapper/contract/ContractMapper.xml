@@ -15,23 +15,24 @@
 	<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ontology.sourcing2c.dao.contract.Contract">
 		<result column="detail" jdbcType="LONGVARCHAR" property="detail"/>
 		<result column="timestamp_sign" jdbcType="LONGVARCHAR" property="timestampSign"/>
+		<result column="cyano_info" jdbcType="LONGVARCHAR" property="cyanoInfo"/>
 	</resultMap>
 
 	<sql id="Base_Column_List">
 		ontid, txhash, filehash, contract_key, type, timestamp, create_time, update_time, status
 	</sql>
 	<sql id="Blob_Column_List">
-		detail, timestamp_sign
+		detail, timestamp_sign, cyano_info
 	</sql>
 
 	<insert id="insert" parameterType="com.ontology.sourcing2c.dao.contract.Contract">
-		insert into ${tableName} (ontid,  txhash, filehash, contract_key, type,
+		insert into ${tableName} (ontid, txhash, filehash, contract_key, type,
 		                          timestamp, create_time, update_time,
-		                          detail, timestamp_sign)
-		values (#{record.ontid,jdbcType=VARCHAR},  #{record.txhash,jdbcType=VARCHAR}, #{record.filehash,jdbcType=VARCHAR}, #{record.contractKey,jdbcType=VARCHAR},
+		                          detail, timestamp_sign, cyano_info)
+		values (#{record.ontid,jdbcType=VARCHAR}, #{record.txhash,jdbcType=VARCHAR}, #{record.filehash,jdbcType=VARCHAR}, #{record.contractKey,jdbcType=VARCHAR},
 		        #{record.type,jdbcType=VARCHAR},
 		        #{record.timestamp,jdbcType=TIMESTAMP}, #{record.createTime,jdbcType=TIMESTAMP}, #{record.updateTime,jdbcType=TIMESTAMP},
-		        #{record.detail,jdbcType=LONGVARCHAR}, #{record.timestampSign,jdbcType=LONGVARCHAR})
+		        #{record.detail,jdbcType=LONGVARCHAR}, #{record.timestampSign,jdbcType=LONGVARCHAR}, #{record.cyanoInfo,jdbcType=LONGVARCHAR})
 	</insert>
 
 	<insert id="insertSelective" parameterType="com.ontology.sourcing2c.dao.contract.Contract">
@@ -103,12 +104,12 @@
 	</insert>
 
 	<insert id="insertBatch">
-		INSERT INTO ${tableName} (ontid,  txhash, filehash, contract_key, type,
+		INSERT INTO ${tableName} (ontid, txhash, filehash, contract_key, type,
 		timestamp, create_time, update_time,
 		detail, timestamp_sign)
 		VALUES
 		<foreach collection="contractList" item="record" separator=",">
-			(#{record.ontid,jdbcType=VARCHAR},  #{record.txhash,jdbcType=VARCHAR}, #{record.filehash,jdbcType=VARCHAR}, #{record.contractKey,jdbcType=VARCHAR},
+			(#{record.ontid,jdbcType=VARCHAR}, #{record.txhash,jdbcType=VARCHAR}, #{record.filehash,jdbcType=VARCHAR}, #{record.contractKey,jdbcType=VARCHAR},
 			#{record.type,jdbcType=VARCHAR},
 			#{record.timestamp,jdbcType=TIMESTAMP}, #{record.createTime,jdbcType=TIMESTAMP}, #{record.updateTime,jdbcType=TIMESTAMP},
 			#{record.detail,jdbcType=LONGVARCHAR}, #{record.timestampSign,jdbcType=LONGVARCHAR})
@@ -181,5 +182,26 @@
 		order by create_time desc
 	</select>
 
+	<select id="selectByContractKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+		select
+		<include refid="Base_Column_List"/>
+		,
+		<include refid="Blob_Column_List"/>
+		from ${tableName}
+		where contract_key = #{hash,jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectCyanoInfoByContractKey" parameterType="java.lang.String" resultType="java.lang.String">
+		select cyano_info
+		from ${tableName}
+		where contract_key = #{hash,jdbcType=VARCHAR}
+	</select>
+
+	<update id="updateByContractKey" parameterType="com.ontology.sourcing2c.dao.contract.Contract">
+		update ${tableName}
+		set txhash = #{txhash,jdbcType=VARCHAR},
+		    status = #{status,jdbcType=INTEGER}
+		where contract_key = #{contractKey,jdbcType=INTEGER}
+	</update>
 
 </mapper>

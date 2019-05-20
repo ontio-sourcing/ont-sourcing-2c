@@ -55,7 +55,7 @@ public class ValidateService {
             throw new Exception("txhash length should be 64.");
     }
 
-    private void validateHash(String hash) throws Exception {
+    public void validateHash(String hash) throws Exception {
         //
         if (StringUtils.isEmpty(hash))
             throw new Exception("hash is empty.");

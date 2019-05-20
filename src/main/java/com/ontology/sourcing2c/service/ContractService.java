@@ -266,6 +266,29 @@ public class ContractService {
     }
 
     //
+    public Contract selectByContractKey(String hash) {
+
+        // TODO 目前只支持从当前表查询
+        Contract c = contractMapper.selectByContractKey(GlobalVariable.CURRENT_CONTRACT_TABLE_NAME, hash);
+        return c;
+    }
+
+    //
+    public Integer updateByContractKey(String txhash, Integer status, String contractKey) {
+
+        // TODO 目前只支持从当前表查询
+        return contractMapper.updateByContractKey(GlobalVariable.CURRENT_CONTRACT_TABLE_NAME, txhash, status, contractKey);
+    }
+
+    //
+    public String selectCyanoInfoByContractKey(String hash) {
+
+        // TODO 目前只支持从当前表查询
+        String info = contractMapper.selectCyanoInfoByContractKey(GlobalVariable.CURRENT_CONTRACT_TABLE_NAME, hash);
+        return info;
+    }
+
+    //
     public Integer count(String ontid) {
         String tableName = getIndex(ontid).getName();
         return contractMapper.count(tableName, ontid);
@@ -326,8 +349,8 @@ public class ContractService {
     }
 
     // 写入数据库，batch insert
-    public void saveToLocalBatch(String ontid, List<Contract> contractList) {
-        contractMapper.insertBatch(getIndex(ontid).getName(), contractList);
-    }
+    // public void saveToLocalBatch(String ontid, List<Contract> contractList) {
+    //     contractMapper.insertBatch(getIndex(ontid).getName(), contractList);
+    // }
 
 }

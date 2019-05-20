@@ -144,9 +144,6 @@ public class ContractController {
             //
             contract.setContractKey(key);
 
-            //
-            contractService.saveToLocal(ontid, contract);
-
             // todo
             // https://github.com/ontio-cyano/integration-docs/blob/master/cn/%E9%92%B1%E5%8C%85%E5%AF%B9%E6%8E%A5-%E9%92%B1%E5%8C%85%E6%89%93%E5%BC%80DApp.md
             Arg a1 = new Arg();
@@ -184,14 +181,45 @@ public class ContractController {
             cq.setParams(pr);
 
             //
-            rst.setResult(cq);
+            contract.setCyanoInfo(gson.toJson(cq));
+
+            //
+            contractService.saveToLocal(ontid, contract);
+
+            //
+            rst.setResult("/api/v1/c/attestation/cyano/" + contract.getContractKey());
             rst.setErrorAndDesc(ErrorCode.SUCCESSS);
+
+            //
             return new ResponseEntity<>(rst, HttpStatus.OK);
         } catch (Exception e) {
             logger.error(e.getMessage());
             rst.setErrorAndDesc(e);
             return new ResponseEntity<>(rst, HttpStatus.OK);
         }
+    }
+
+    @GetMapping("/attestation/cyano/{hash}")
+    public ResponseEntity<Result> getAttestationCyanoInfo(@PathVariable String hash) {
+        //
+        Result rst = new Result("getAttestationCyanoInfo");
+
+        //
+        try {
+            validateService.validateHash(hash);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            rst.setErrorAndDesc(e);
+            return new ResponseEntity<>(rst, HttpStatus.OK);
+        }
+
+        //
+        Contract contract = contractService.selectByContractKey(hash);
+        String info = contract.getCyanoInfo();
+        CyanoRequest cq = gson.fromJson(info, CyanoRequest.class);
+        rst.setResult(cq);
+
+        return new ResponseEntity<>(rst, HttpStatus.OK);
     }
 
     @PostMapping("/attestation/hash")

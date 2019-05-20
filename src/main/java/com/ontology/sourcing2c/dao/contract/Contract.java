@@ -31,6 +31,15 @@ public class Contract {
 
     private Integer height;  // 跨表
 
+    private String cyanoInfo;
+
+    public String getCyanoInfo() {
+        return cyanoInfo;
+    }
+
+    public void setCyanoInfo(String cyanoInfo) {
+        this.cyanoInfo = cyanoInfo;
+    }
 
     public Integer getHeight() {
         return height;

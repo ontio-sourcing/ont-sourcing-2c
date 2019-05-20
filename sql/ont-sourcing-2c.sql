@@ -13,9 +13,9 @@ START TRANSACTION;
 SET time_zone = "+00:00";
 
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT = @@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS = @@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION = @@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
 --
@@ -29,11 +29,13 @@ SET time_zone = "+00:00";
 --
 
 DROP TABLE IF EXISTS `tbl_contract_index`;
-CREATE TABLE `tbl_contract_index` (
-                                      `id` int(11) NOT NULL,
-                                      `name` varchar(64) NOT NULL,
-                                      `flag` int(11) NOT NULL DEFAULT '0' COMMENT '当前操作表'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `tbl_contract_index`
+(
+    `id`   int(11)     NOT NULL,
+    `name` varchar(64) NOT NULL,
+    `flag` int(11)     NOT NULL DEFAULT '0' COMMENT '当前操作表'
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;
 
 -- --------------------------------------------------------
 
@@ -41,13 +43,15 @@ CREATE TABLE `tbl_contract_index` (
 -- Table structure for table `tbl_contract_ontid`
 --
 DROP TABLE IF EXISTS `tbl_contract_ontid`;
-CREATE TABLE `tbl_contract_ontid` (
-                                      `id` int(11) NOT NULL,
-                                      `ontid` varchar(255) DEFAULT NULL,
-                                      `contract_index` int(11) DEFAULT NULL,
-                                      `create_time` datetime DEFAULT NULL,
-                                      `update_time` datetime DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+CREATE TABLE `tbl_contract_ontid`
+(
+    `id`             int(11) NOT NULL,
+    `ontid`          varchar(255) DEFAULT NULL,
+    `contract_index` int(11)      DEFAULT NULL,
+    `create_time`    datetime     DEFAULT NULL,
+    `update_time`    datetime     DEFAULT NULL
+) ENGINE = MyISAM
+  DEFAULT CHARSET = utf8;
 
 -- --------------------------------------------------------
 
@@ -55,14 +59,28 @@ CREATE TABLE `tbl_contract_ontid` (
 -- Table structure for table `tbl_event`
 --
 DROP TABLE IF EXISTS `tbl_event`;
-CREATE TABLE `tbl_event` (
-                             `id` int(11) NOT NULL,
-                             `txhash` varchar(255) NOT NULL,
-                             `event` text NOT NULL,
-                             `height` int(11) NOT NULL,
-                             `create_time` datetime NOT NULL,
-                             `update_time` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `tbl_event`
+(
+    `id`          int(11)      NOT NULL,
+    `txhash`      varchar(255) NOT NULL,
+    `event`       text         NOT NULL,
+    `height`      int(11)      NOT NULL,
+    `create_time` datetime     NOT NULL,
+    `update_time` datetime DEFAULT NULL
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;
+
+DROP TABLE IF EXISTS `tbl_sync`;
+CREATE TABLE `tbl_sync`
+(
+    `id`          INT      NOT NULL,
+    `complete`    INT      NOT NULL COMMENT '已经同步过的块高',
+    `create_time` DATETIME NOT NULL,
+    `update_time` DATETIME NOT NULL
+) ENGINE = InnoDB;
+ALTER TABLE `tbl_sync` ADD PRIMARY KEY(`id`);
+ALTER TABLE `tbl_sync` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `tbl_sync` CHANGE `update_time` `update_time` DATETIME NULL;
 
 --
 -- Indexes for dumped tables
@@ -110,6 +128,6 @@ ALTER TABLE `tbl_event`
     MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40101 SET CHARACTER_SET_CLIENT = @OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS = @OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION = @OLD_COLLATION_CONNECTION */;
