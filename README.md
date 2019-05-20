@@ -79,7 +79,11 @@ method：POST
                         "operation": "putRecord",
                         "args": [
                             {
-                                "name": "05fb21c5ccc2c07090c8501afd20c767e7760816c42366367a88741031d736e5",
+                                "name": "key",
+                                "value": "7467b431e3acc8861f6a10a9b312de99f0e4b532de423cc5df2ff10addab0375"
+                            },
+                            {
+                                "name": "value",
                                 "value": "7467b431e3acc8861f6a10a9b312de99f0e4b532de423cc5df2ff10addab0375"
                             }
                         ]

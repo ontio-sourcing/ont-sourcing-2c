@@ -149,12 +149,17 @@ public class ContractController {
 
             // todo
             // https://github.com/ontio-cyano/integration-docs/blob/master/cn/%E9%92%B1%E5%8C%85%E5%AF%B9%E6%8E%A5-%E9%92%B1%E5%8C%85%E6%89%93%E5%BC%80DApp.md
-            Arg a = new Arg();
-            a.setName(key);
-            a.setValue(value);
+            Arg a1 = new Arg();
+            a1.setName("key");
+            a1.setValue(key);
+
+            Arg a2 = new Arg();
+            a2.setName("value");
+            a2.setValue(value);
 
             List<Arg> l1 = new ArrayList<>();
-            l1.add(a);
+            l1.add(a1);
+            l1.add(a2);
 
             Function f = new Function();
             f.setOperation("putRecord");

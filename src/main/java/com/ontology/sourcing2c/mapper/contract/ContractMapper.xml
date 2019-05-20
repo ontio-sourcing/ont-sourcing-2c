@@ -121,7 +121,7 @@
 		,
 		<include refid="Blob_Column_List"/>
 		from ${tableName}
-		where (filehash = #{hash,jdbcType=VARCHAR} or txhash = #{hash,jdbcType=VARCHAR}) and (ontid = #{ontid,jdbcType=VARCHAR}) and
+		where (filehash = #{hash,jdbcType=VARCHAR} or txhash = #{hash,jdbcType=VARCHAR} or contract_key = #{hash,jdbcType=VARCHAR}) and (ontid = #{ontid,jdbcType=VARCHAR}) and
 		status = 0
 		order by create_time desc
 	</select>
