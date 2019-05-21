@@ -2,7 +2,6 @@ package com.ontology.sourcing2c.controller;
 
 import ch.qos.logback.classic.Logger;
 import com.alibaba.fastjson.JSONObject;
-import com.github.ontio.common.Helper;
 import com.google.gson.Gson;
 import com.ontology.sourcing2c.dao.contract.Contract;
 import com.ontology.sourcing2c.model.contract.cyano.*;
@@ -20,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -148,11 +148,11 @@ public class ContractController {
             // https://github.com/ontio-cyano/integration-docs/blob/master/cn/%E9%92%B1%E5%8C%85%E5%AF%B9%E6%8E%A5-%E9%92%B1%E5%8C%85%E6%89%93%E5%BC%80DApp.md
             Arg a1 = new Arg();
             a1.setName("key");
-            a1.setValue(key);
+            a1.setValue("String:" + key);
 
             Arg a2 = new Arg();
             a2.setName("value");
-            a2.setValue(value);
+            a2.setValue("String:" + value);
 
             List<Arg> l1 = new ArrayList<>();
             l1.add(a1);
@@ -167,7 +167,8 @@ public class ContractController {
 
             InvokeConfig ic = new InvokeConfig();
             ic.setFunctions(l2);
-            ic.setContractHash(Helper.reverse(propertiesService.codeAddr));
+            // ic.setContractHash(Helper.reverse(propertiesService.codeAddr));
+            ic.setContractHash(propertiesService.codeAddr);
             ic.setGasLimit(20000);
             ic.setGasPrice(500);
 
@@ -177,21 +178,42 @@ public class ContractController {
             CyanoRequest cq = new CyanoRequest();
             cq.setAction("invoke");
             cq.setVersion("v1.0.0");
-            cq.setId(UUID.randomUUID().toString());
+            String uuidStr = UUID.randomUUID().toString();
+            cq.setId(uuidStr);
             cq.setParams(pr);
 
             //
             contract.setCyanoInfo(gson.toJson(cq));
+            contract.setUuid(uuidStr);
 
             //
             contractService.saveToLocal(ontid, contract);
 
             //
-            rst.setResult("/api/v1/c/attestation/cyano/" + contract.getContractKey());
+            String qrcodeUrl = "/api/v1/c/attestation/cyano/" + contract.getContractKey();
+            String callbackUrl = "/api/v1/c/attestation/cyano/callback";
+
+            //
+            Map<String, Object> m = new HashMap<>();
+            m.put("action", "invoke");
+            m.put("version", "v1.0.0");
+            m.put("id", uuidStr);
+
+            Map<String, Object> m1 = new HashMap<>();
+            m1.put("login", true);
+            m1.put("message", "");
+            m1.put("callback", callbackUrl);
+            m1.put("qrcodeUrl", qrcodeUrl);
+
+            m.put("params", m1);
+
+            //
+            rst.setResult(m);
             rst.setErrorAndDesc(ErrorCode.SUCCESSS);
 
             //
             return new ResponseEntity<>(rst, HttpStatus.OK);
+            // return new ResponseEntity<Object>(m, HttpStatus.OK);
         } catch (Exception e) {
             logger.error(e.getMessage());
             rst.setErrorAndDesc(e);
@@ -200,7 +222,7 @@ public class ContractController {
     }
 
     @GetMapping("/attestation/cyano/{hash}")
-    public ResponseEntity<Result> getAttestationCyanoInfo(@PathVariable String hash) {
+    public ResponseEntity<Object> getAttestationCyanoInfo(@PathVariable String hash) {
         //
         Result rst = new Result("getAttestationCyanoInfo");
 
@@ -210,16 +232,60 @@ public class ContractController {
         } catch (Exception e) {
             logger.error(e.getMessage());
             rst.setErrorAndDesc(e);
-            return new ResponseEntity<>(rst, HttpStatus.OK);
+            return new ResponseEntity<>(null, HttpStatus.OK);
         }
 
         //
         Contract contract = contractService.selectByContractKey(hash);
-        String info = contract.getCyanoInfo();
-        CyanoRequest cq = gson.fromJson(info, CyanoRequest.class);
-        rst.setResult(cq);
+        if (contract != null) {
+            String info = contract.getCyanoInfo();
+            CyanoRequest cq = gson.fromJson(info, CyanoRequest.class);
+            rst.setResult(cq);
+            //
+            return new ResponseEntity<>(cq, HttpStatus.OK);
+        } else {
+            // 已经删了，也就是二维码已失效了
+            // rst.setResult("");
+            //
+            return new ResponseEntity<>("", HttpStatus.OK);
+        }
+    }
 
-        return new ResponseEntity<>(rst, HttpStatus.OK);
+    @PostMapping("/attestation/cyano/callback")
+    public ResponseEntity<Object> attestationCallback(@RequestBody LinkedHashMap<String, Object> obj) {
+
+        //
+        Result rst = new Result("attestationCallback");
+
+        //
+        String uuidStr = (String) obj.get("id");
+        String txhash = (String) obj.get("result");
+
+        //
+        logger.debug("attestationCallback start ... {} , {}", uuidStr, txhash);
+
+        //
+        try {
+            //
+            Contract exist = contractService.selectByUUID(uuidStr);
+            if (exist != null && StringUtils.isEmpty(exist.getTxhash())) {
+                //
+                contractService.updateByUUID(txhash, 0, uuidStr, new Date());
+                // 链同步
+                syncService.confirmTx(txhash);
+            }
+
+            //
+            rst.setResult(true);
+            rst.setErrorAndDesc(ErrorCode.SUCCESSS);
+            return new ResponseEntity<>(rst, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            rst.setErrorAndDesc(e);
+            return new ResponseEntity<>(rst, HttpStatus.OK);
+        }
+
+
     }
 
     @PostMapping("/attestation/hash")

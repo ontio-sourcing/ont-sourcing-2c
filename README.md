@@ -38,11 +38,11 @@ method：POST
 	"filehash":"111175b25e49f2767522d332057c3e6bb1144c842dce47913dc8222927999999",
 	"metadata": {
             "name":"",
-            "Title": "",
-            "Tags": "",
-            "Description":"",
-            "Timestamp": "",
-            "Location":""
+            "title": "",
+            "tags": "",
+            "description":"",
+            "timestamp": "",
+            "location":""
 	},
 	"context": {
 	    "image": ["",""],
@@ -66,11 +66,21 @@ method：POST
 
 ```json
 {
+    "action": "putAttestation",
     "desc": "SUCCESS",
-    "error": 0,
     "version": "1.0.0",
-    "result": "/api/v1/c/attestation/cyano/ca4e952e3f96fb4c1b800153bf6d2c8c648b88371f613d13ea8ac75f29048f29",
-    "action": "putAttestation"
+    "result": {
+        "action": "invoke",
+        "id": "ae1817fa-f010-457f-b3bf-661c77c5eaff",
+        "params": {
+            "callback": "/api/v1/c/attestation/cyano/callback",
+            "login": true,
+            "message": "",
+            "qrcodeUrl": "/api/v1/c/attestation/cyano/b119147dce403a1ff0af7c964a7af46d5d27c52b3e3e4cf259a925fa0e5b56a0"
+        },
+        "version": "v1.0.0"
+    },
+    "error": 0
 }
 ```
 
@@ -79,7 +89,7 @@ method：POST
 | error      | int    | 错误码                        |
 | action     | String | 动作标志                      |
 | desc       | String | 成功返回SUCCESS，失败返回错误描述 |
-| result     | String | 成功返回true，失败返回""     |
+| result     | String |      |
 | version    | String | 版本号                        |
 
 ### 二维码
@@ -97,48 +107,36 @@ method：GET
 
 ```json
 {
-    "desc": "SUCCESS",
-    "action": "getAttestationCyanoInfo",
-    "result": {
-        "action": "invoke",
-        "version": "v1.0.0",
-        "id": "294683bc-6af7-42b3-ab54-0a20d719961a",
-        "params": {
-            "invokeConfig": {
-                "contractHash": "8fe3eabb062637986be6e3f6fa034504d10e51e2",
-                "functions": [
-                    {
-                        "operation": "putRecord",
-                        "args": [
-                            {
-                                "name": "key",
-                                "value": "7467b431e3acc8861f6a10a9b312de99f0e4b532de423cc5df2ff10addab0375"
-                            },
-                            {
-                                "name": "value",
-                                "value": "e81475b25e49f2767522d332057c3e6bb1144c842dce47913dc8222927102c67"
-                            }
-                        ]
-                    }
-                ],
-                "payer": null,
-                "gasLimit": 20000,
-                "gasPrice": 500
-            }
+    "action": "invoke",
+    "version": "v1.0.0",
+    "id": "42782725-dab0-4bb6-9765-3e3ac34c8dfb",
+    "params": {
+        "invokeConfig": {
+            "contractHash": "e2510ed1044503faf6e3e66b98372606bbeae38f",
+            "functions": [
+                {
+                    "operation": "putRecord",
+                    "args": [
+                        {
+                            "name": "key",
+                            "value": "String:6e238ca84ec0b5c230616f5d47bad79a7462da04b3925aa1c73f70b30905e641"
+                        },
+                        {
+                            "name": "value",
+                            "value": "String:9408a4112af3337e13a5850f20cf5158f65aecd428be3ac4376819e8d38491a0"
+                        }
+                    ]
+                }
+            ],
+            "payer": null,
+            "gasLimit": 20000,
+            "gasPrice": 500
         }
-    },
-    "error": 0,
-    "version": "1.0.0"
+    }
 }
 ```
 
-| Field_Name | Type   | Description                   |
-|:-----------|:-------|:------------------------------|
-| error      | int    | 错误码                        |
-| action     | String | 动作标志                      |
-| desc       | String | 成功返回SUCCESS，失败返回错误描述 |
-| result     | String | 成功返回true，失败返回""     |
-| version    | String | 版本号                        |
+二维码过期后，得到空字符串。
 
 
 

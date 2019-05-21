@@ -4,6 +4,7 @@ import com.ontology.sourcing2c.dao.contract.Contract;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -25,13 +26,21 @@ public interface ContractMapper {
     List<Contract> selectByHash(@Param("tableName") String tableName, @Param("hash") String hash);
 
     //
-    Contract selectByContractKey(@Param("tableName") String tableName, @Param("hash") String hash);
+    List<Contract> selectByContractKey(@Param("tableName") String tableName, @Param("hash") String hash);
+
+    //
+    List<Contract> selectByUUID(@Param("tableName") String tableName, @Param("uuidStr") String uuidStr);
 
     //
     String selectCyanoInfoByContractKey(@Param("tableName") String tableName, @Param("hash") String hash);
 
     //
-    Integer updateByContractKey(@Param("tableName") String tableName, @Param("txhash") String txhash, @Param("status") Integer status, @Param("contractKey") String contractKey);
+    Integer updateByContractKey(@Param("tableName") String tableName, @Param("txhash") String txhash, @Param("status") Integer status, @Param("contractKey") String contractKey,
+                                @Param("updateTime") Date updateTime);
+
+    //
+    Integer updateByUUID(@Param("tableName") String tableName, @Param("txhash") String txhash, @Param("status") Integer status, @Param("uuidStr") String uuidStr,
+                                @Param("updateTime") Date updateTime);
 
     //
     int count(@Param("tableName") String tableName, @Param("ontid") String ontid);
@@ -46,4 +55,7 @@ public interface ContractMapper {
 
     //
     List<Contract> selectByPageNumSize(@Param("tableName") String tableName, @Param("start") int start, @Param("offset") int offset);
+
+    //
+    Integer deleteByCreateTime(@Param("tableName") String tableName, @Param("createTime") Date createTime);
 }

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.ontology.sourcing2c.mapper.contract.ContractMapper">
+
 	<resultMap id="BaseResultMap" type="com.ontology.sourcing2c.dao.contract.Contract">
 		<result column="ontid" jdbcType="VARCHAR" property="ontid"/>
 		<result column="txhash" jdbcType="VARCHAR" property="txhash"/>
@@ -11,7 +13,9 @@
 		<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
 		<result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
 		<result column="status" jdbcType="INTEGER" property="status"/>
+		<result column="uuid" jdbcType="VARCHAR" property="uuid"/>
 	</resultMap>
+
 	<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ontology.sourcing2c.dao.contract.Contract">
 		<result column="detail" jdbcType="LONGVARCHAR" property="detail"/>
 		<result column="timestamp_sign" jdbcType="LONGVARCHAR" property="timestampSign"/>
@@ -19,7 +23,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List">
-		ontid, txhash, filehash, contract_key, type, timestamp, create_time, update_time, status
+		ontid, txhash, filehash, contract_key, type, timestamp, create_time, update_time, status, uuid
 	</sql>
 	<sql id="Blob_Column_List">
 		detail, timestamp_sign, cyano_info
@@ -28,11 +32,11 @@
 	<insert id="insert" parameterType="com.ontology.sourcing2c.dao.contract.Contract">
 		insert into ${tableName} (ontid, txhash, filehash, contract_key, type,
 		                          timestamp, create_time, update_time,
-		                          detail, timestamp_sign, cyano_info)
+		                          detail, timestamp_sign, cyano_info, uuid)
 		values (#{record.ontid,jdbcType=VARCHAR}, #{record.txhash,jdbcType=VARCHAR}, #{record.filehash,jdbcType=VARCHAR}, #{record.contractKey,jdbcType=VARCHAR},
 		        #{record.type,jdbcType=VARCHAR},
 		        #{record.timestamp,jdbcType=TIMESTAMP}, #{record.createTime,jdbcType=TIMESTAMP}, #{record.updateTime,jdbcType=TIMESTAMP},
-		        #{record.detail,jdbcType=LONGVARCHAR}, #{record.timestampSign,jdbcType=LONGVARCHAR}, #{record.cyanoInfo,jdbcType=LONGVARCHAR})
+		        #{record.detail,jdbcType=LONGVARCHAR}, #{record.timestampSign,jdbcType=LONGVARCHAR}, #{record.cyanoInfo,jdbcType=LONGVARCHAR}, #{record.uuid,jdbcType=VARCHAR})
 	</insert>
 
 	<insert id="insertSelective" parameterType="com.ontology.sourcing2c.dao.contract.Contract">
@@ -191,6 +195,15 @@
 		where contract_key = #{hash,jdbcType=VARCHAR}
 	</select>
 
+	<select id="selectByUUID" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+		select
+		<include refid="Base_Column_List"/>
+		,
+		<include refid="Blob_Column_List"/>
+		from ${tableName}
+		where uuid = #{uuidStr,jdbcType=VARCHAR}
+	</select>
+
 	<select id="selectCyanoInfoByContractKey" parameterType="java.lang.String" resultType="java.lang.String">
 		select cyano_info
 		from ${tableName}
@@ -200,8 +213,26 @@
 	<update id="updateByContractKey" parameterType="com.ontology.sourcing2c.dao.contract.Contract">
 		update ${tableName}
 		set txhash = #{txhash,jdbcType=VARCHAR},
-		    status = #{status,jdbcType=INTEGER}
+		    status = #{status,jdbcType=INTEGER},
+		    update_time = #{updateTime,jdbcType=TIMESTAMP}
 		where contract_key = #{contractKey,jdbcType=INTEGER}
 	</update>
+
+	<update id="updateByUUID" parameterType="com.ontology.sourcing2c.dao.contract.Contract">
+		update ${tableName}
+		set txhash = #{txhash,jdbcType=VARCHAR},
+		status = #{status,jdbcType=INTEGER},
+		update_time = #{updateTime,jdbcType=TIMESTAMP}
+		where uuid = #{uuidStr,jdbcType=INTEGER}
+	</update>
+
+	<delete id="deleteByCreateTime">
+		delete from ${tableName}
+		where create_time &lt;= #{createTime,jdbcType=TIMESTAMP} and status = 2
+	</delete>
+
+<!--	<delete id="deleteAuthor">-->
+<!--		delete from Author where id = #{id}-->
+<!--	</delete>-->
 
 </mapper>

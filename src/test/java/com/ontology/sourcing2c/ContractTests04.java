@@ -48,8 +48,17 @@ public class ContractTests04 {
         paramList.add("putRecord".getBytes());
 
         List args = new ArrayList();
-        args.add("7467b431e3acc8861f6a10a9b312de99f0e4b532de423cc5df2ff10addab0375");
-        args.add("e81475b25e49f2767522d332057c3e6bb1144c842dce47913dc8222927102c67");
+
+        // args.add("7467b431e3acc8861f6a10a9b312de99f0e4b532de423cc5df2ff10addab0375");
+        // args.add("e81475b25e49f2767522d332057c3e6bb1144c842dce47913dc8222927102c67");
+
+        // args.add("ca4e952e3f96fb4c1b800153bf6d2c8c648b88371f613d13ea8ac75f29048f29");
+        // args.add("3fa48bd8e69f2ee23f9a668bb1c687aecd74faaf6a09cf7b8547f8a8f3609bf9");
+        // txhash 69a68994f96a0bb408f8e28bd0573407d15a87cd7fbccb7c1537085ba669fce9
+
+        args.add("d074f682be104081482da7277160796762880f4dcc3546c060dabc2f2585d4ff");
+        args.add("03081ca971bfb2d0b79caf228af09cba00637a9a3da3c6e9c8bd1fc85b6ca1ed");
+        // txhash 3c6de3c717bda6a054f96d4fcb46a8b65152320afa008b01a4919c9335f96f2e
 
         paramList.add(args);
         byte[] params = BuildParams.createCodeParamsScript(paramList);
@@ -126,5 +135,27 @@ public class ContractTests04 {
         System.out.println(n3);
         // e81475b25e49f2767522d332057c3e6bb1144c842dce47913dc8222927102c67
     }
+
+
+    @Test
+    public void example03() throws ConnectorException, IOException, DecoderException {
+
+        Object rst = chainService.ontSdk.getConnect().getSmartCodeEvent("8ec363b0a9710803af00a354661fc4d87f90720d355952b441b4d5c100768fac");
+        System.out.println(rst);
+    }
+
+    @Test
+    public void example05() throws ConnectorException, IOException {
+
+        for (int i = 0; i < 5; i++) {
+
+            // Object obj = chainService.ontSdk.getConnect().getSmartCodeEvent(0);
+            Object obj = chainService.ontSdk.getConnect().getSmartCodeEvent(1790451);
+            System.out.println(obj.toString());
+
+            chainService.switchOntSdk();
+        }
+    }
+
 
 }

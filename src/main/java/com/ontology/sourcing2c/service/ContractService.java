@@ -15,6 +15,7 @@ import com.ontology.sourcing2c.util.GlobalVariable;
 import com.ontology.sourcing2c.util._hash.Sha256Util;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -269,15 +270,40 @@ public class ContractService {
     public Contract selectByContractKey(String hash) {
 
         // TODO 目前只支持从当前表查询
-        Contract c = contractMapper.selectByContractKey(GlobalVariable.CURRENT_CONTRACT_TABLE_NAME, hash);
-        return c;
+        List<Contract> l = contractMapper.selectByContractKey(GlobalVariable.CURRENT_CONTRACT_TABLE_NAME, hash);
+        //
+        if (l.size() == 0) {
+            return null;
+        } else {
+            return l.get(0);
+        }
     }
 
     //
-    public Integer updateByContractKey(String txhash, Integer status, String contractKey) {
+    public Contract selectByUUID(String uuidStr) {
 
         // TODO 目前只支持从当前表查询
-        return contractMapper.updateByContractKey(GlobalVariable.CURRENT_CONTRACT_TABLE_NAME, txhash, status, contractKey);
+        List<Contract> l = contractMapper.selectByUUID(GlobalVariable.CURRENT_CONTRACT_TABLE_NAME, uuidStr);
+        //
+        if (l.size() == 0) {
+            return null;
+        } else {
+            return l.get(0);
+        }
+    }
+
+    //
+    public Integer updateByContractKey(String txhash, Integer status, String contractKey, Date updateTime) {
+
+        // TODO 目前只支持从当前表查询
+        return contractMapper.updateByContractKey(GlobalVariable.CURRENT_CONTRACT_TABLE_NAME, txhash, status, contractKey, updateTime);
+    }
+
+    //
+    public Integer updateByUUID(String txhash, Integer status, String uuidStr, Date updateTime) {
+
+        // TODO 目前只支持从当前表查询
+        return contractMapper.updateByUUID(GlobalVariable.CURRENT_CONTRACT_TABLE_NAME, txhash, status, uuidStr, updateTime);
     }
 
     //
@@ -352,5 +378,23 @@ public class ContractService {
     // public void saveToLocalBatch(String ontid, List<Contract> contractList) {
     //     contractMapper.insertBatch(getIndex(ontid).getName(), contractList);
     // }
+
+    static final long ONE_MINUTE_IN_MILLIS = 60000;//millisecs
+
+    @Scheduled(initialDelay = 20000, fixedDelay = 60000)
+    public void cleanTable() {
+
+        //
+        logger.info("cleanTable start ...");
+
+        //
+        Calendar date = Calendar.getInstance();
+        long t = date.getTimeInMillis();
+        Date TenMinsBefore = new Date(t - (10 * ONE_MINUTE_IN_MILLIS));
+
+        //
+        contractMapper.deleteByCreateTime(GlobalVariable.CURRENT_CONTRACT_TABLE_NAME, TenMinsBefore);
+
+    }
 
 }

@@ -41,9 +41,10 @@ public class SyncService {
     private ChainService chainService;
 
     @Autowired
-    public SyncService(PropertiesService propertiesService, EventMapper eventMapper, SyncMapper syncMapper, ChainService chainService) {
+    public SyncService(PropertiesService propertiesService, ContractService contractService, EventMapper eventMapper, SyncMapper syncMapper, ChainService chainService) {
         //
         this.propertiesService = propertiesService;
+        this.contractService = contractService;
         //
         this.eventMapper = eventMapper;
         this.syncMapper = syncMapper;
@@ -71,13 +72,17 @@ public class SyncService {
                         // 获取交易所在的区块高度
                         int height = chainService.ontSdk.getConnect().getBlockHeightByTxHash(txhash);
                         //
-                        String eventStr = JSON.toJSONString(event);
-                        Event record = new Event();
-                        record.setTxhash(txhash);
-                        record.setEvent(eventStr);
-                        record.setHeight(height);
-                        record.setCreateTime(new Date());
-                        eventMapper.save(record);
+                        Event exist = eventMapper.findByTxhash(txhash);
+                        if (exist == null) {
+                            //
+                            String eventStr = JSON.toJSONString(event);
+                            Event record = new Event();
+                            record.setTxhash(txhash);
+                            record.setEvent(eventStr);
+                            record.setHeight(height);
+                            record.setCreateTime(new Date());
+                            eventMapper.save(record);
+                        }
                         //
                         break;
                     } catch (ConnectorException | IOException e) {
@@ -104,7 +109,7 @@ public class SyncService {
     /**
      * 同步链上信息
      */
-    @Scheduled(initialDelay = 5000, fixedDelay = 10000)
+    @Scheduled(initialDelay = 10000, fixedDelay = 10000)
     public void synchronizeData() {
 
         //
@@ -119,6 +124,7 @@ public class SyncService {
             blockHeight = chainService.ontSdk.getConnect().getBlockHeight();
         } catch (ConnectorException | IOException e) {
             logger.error("getBlockHeight error {}", e.getMessage());
+            return;
         }
 
 
@@ -143,26 +149,39 @@ public class SyncService {
         logger.info("开始块高：{}", startHeight);
 
         //
+        if (startHeight >= blockHeight) {
+            logger.info("startHeight >= blockHeight, try later ...");
+            return;
+        }
+
+        //
         for (h = startHeight; h <= blockHeight; h++) {
 
             //
             logger.info("开始处理块高:{}", h);
 
             //
-            Object eventsRst = null;
+            String eventsStr = "";
             try {
-                eventsRst = chainService.ontSdk.getConnect().getSmartCodeEvent(h);
+                Object eventsRst = chainService.ontSdk.getConnect().getSmartCodeEvent(h);
+                eventsStr = eventsRst.toString();
             } catch (ConnectorException | IOException e) {
                 logger.error("getSmartCodeEvent error {}", e.getMessage());
                 return;
             }
 
             //
-            List<EventPojo> eventsPojo = JSON.parseArray(eventsRst.toString(), EventPojo.class);
+            if (StringUtils.isEmpty(eventsStr)) {
+                logger.error("eventsStr is empty, height is {}", h);
+                continue;
+            }
+
+            //
+            List<EventPojo> eventsPojo = JSON.parseArray(eventsStr, EventPojo.class);
 
             //
             if (eventsPojo == null) {
-                logger.error("eventsPojo is null, height is {}", h);
+                logger.error("eventsPojo is null, height is {}, eventsStr is {}", h, eventsStr);
                 continue;
             }
 
@@ -232,23 +251,32 @@ public class SyncService {
                         // 比较key
                         String s2 = states.get(1);
                         String n2 = new String(Helper.hexToBytes(s2));
+                        //
+                        logger.info("n2 is {}, txhash is {}", n2, txhash);
+                        //
+                        if (n2.contains("String:")) {
+                            n2 = n2.replace("String:", "");
+                        }
                         // System.out.println(n2);
                         // 7467b431e3acc8861f6a10a9b312de99f0e4b532de423cc5df2ff10addab0375
 
                         //
                         Contract c = contractService.selectByContractKey(n2);
-                        if (c != null) {
-                            contractService.updateByContractKey(txhash, 0, n2);
+                        if (c != null && StringUtils.isEmpty(c.getTxhash())) {
+                            contractService.updateByContractKey(txhash, 0, n2, new Date());
                         }
 
                         //
-                        String eventStr = JSON.toJSONString(ep);
-                        Event record = new Event();
-                        record.setTxhash(txhash);
-                        record.setEvent(eventStr);
-                        record.setHeight(h);
-                        record.setCreateTime(new Date());
-                        eventMapper.save(record);
+                        Event exist = eventMapper.findByTxhash(txhash);
+                        if (exist == null) {
+                            String eventStr = JSON.toJSONString(ep);
+                            Event record = new Event();
+                            record.setTxhash(txhash);
+                            record.setEvent(eventStr);
+                            record.setHeight(h);
+                            record.setCreateTime(new Date());
+                            eventMapper.save(record);
+                        }
                     }
 
                 } catch (Exception e) {

@@ -33,6 +33,16 @@ public class Contract {
 
     private String cyanoInfo;
 
+    private String uuid;
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     public String getCyanoInfo() {
         return cyanoInfo;
     }
